@@ -3,22 +3,15 @@ package dada.com.showdrama;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.renderscript.Sampler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
-import java.io.StringReader;
 import java.util.List;
 
-import dada.com.showdrama.DramaList.DramaListRepository;
+import dada.com.showdrama.ShowDramaList.DramaListRepository;
 import dada.com.showdrama.Model.Drama;
-import dada.com.showdrama.Model.DramaPack;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -35,8 +28,11 @@ public class MainActivity extends AppCompatActivity {
         dramaListRepository = new DramaListRepository();
         btn_test = findViewById(R.id.btn_test);
         tv_test = findViewById(R.id.tv_test);
-
-
+        /*InputStream raw =  getResources().openRawResource(R.raw.testdata);
+        Reader rd = new BufferedReader(new InputStreamReader(raw));
+        Gson gson = new Gson();
+        DramaPack obj = gson.fromJson(rd, DramaPack.class);
+        Log.i(TAG, "gson size: "+Integer.toString(obj.getData().size()));*/
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

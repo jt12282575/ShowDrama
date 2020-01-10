@@ -76,4 +76,10 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.0.0"
     annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
 
+    // rating bar
+    implementation 'me.zhanghai.android.materialratingbar:library:1.4.0'
+
+    // RxNetwork
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
+
 }

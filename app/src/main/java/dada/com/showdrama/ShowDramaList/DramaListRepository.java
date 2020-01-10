@@ -1,19 +1,18 @@
-package dada.com.showdrama.DramaList;
-
-import android.content.Context;
-import android.nfc.Tag;
-import android.util.Log;
+package dada.com.showdrama.ShowDramaList;
 
 import androidx.paging.DataSource;
 import androidx.paging.PagedList;
 import androidx.paging.RxPagedListBuilder;
-import androidx.room.Room;
 
 
-import java.security.Key;
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import dada.com.showdrama.Base.BaseContract;
 import dada.com.showdrama.Data.ApiClient;
@@ -23,23 +22,20 @@ import dada.com.showdrama.Data.Room.DramaDatabase;
 import dada.com.showdrama.Global;
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.Model.DramaPack;
+import dada.com.showdrama.R;
+import dada.com.showdrama.Util.Constant;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.Subject;
 
 public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> {
     protected static ApiStores apiStores;
     protected  DramaDao dramaDao;
-    private Context context;
+
 
     private static final String TAG = "DramaListRepository";
     private PagedList.Config config;
-    private int PAGE_SIZE = 8;
-    private int PRE_FETCH_DISTANCE = 3;
+    private int PAGE_SIZE = Constant.PAGESIZE;
+    private int PRE_FETCH_DISTANCE = Constant.PRE_FETCH_DISTANCE;
 
     public DramaListRepository() {
         dramaDao = getDramaDao();
@@ -50,13 +46,18 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
                 .setEnablePlaceholders(false)
                 .build();
         final List<Drama> dramaList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        /*for (int i = 0; i < 10; i++) {
             dramaList.add(getDrama(i));
-        }
+        }*/
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dramaDao.insertDramasList(dramaList);
+                InputStream raw =  Global.instance.getApplicationContext().getResources().openRawResource(R.raw.testdata);
+                Reader rd = new BufferedReader(new InputStreamReader(raw));
+                Gson gson = new Gson();
+                DramaPack obj = gson.fromJson(rd, DramaPack.class);
+                dramaDao.deleteAll();
+                dramaDao.insertDramasList(obj.getData());
             }
         }).start();
 
@@ -74,8 +75,10 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
     }
 
     @Override
-    public Observable<List<Drama>> getDatalocal() {
-        return getDramaDao().getAll();
+    public Observable<PagedList<Drama>> getDatalocal() {
+        DataSource.Factory<Integer,Drama> factory = getDramaDao().getAll();
+        RxPagedListBuilder<Integer,Drama> rxPagedListBuilder = new RxPagedListBuilder(factory, config);
+        return rxPagedListBuilder.buildObservable();
     }
 
     public Observable<PagedList<Drama>> getDramaFromKeyWord(String keyword){

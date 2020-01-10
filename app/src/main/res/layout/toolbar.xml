@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    app:titleTextColor="@color/text_color_primary"
+    app:collapseIcon="@drawable/ic_arrow_back_black_24dp"
+    android:theme="@style/myToolbarTheme"
+    android:minHeight="?actionBarSize">
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/sdl_sv_searchkeyword"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:iconifiedByDefault="false"
+        android:queryHint="搜尋"
+        android:layout_marginLeft="64dp"
+        app:searchIcon="@drawable/ic_search_black_24dp"
+        app:closeIcon="@drawable/ic_close_black_24dp" />
+
+
+</androidx.appcompat.widget.Toolbar>

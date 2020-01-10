@@ -10,6 +10,9 @@ import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "DRAMA")
 public class Drama {
 
+
+
+
     @PrimaryKey
     @SerializedName("drama_id")
     @Expose
@@ -86,6 +89,17 @@ public class Drama {
 
     public void setRating(Double rating) {
         this.rating = rating;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        Drama drama = (Drama) obj;
+
+        return drama.getDramaId() == this.getDramaId() &&
+                drama.getName().equals(this.getName());
     }
 
 }

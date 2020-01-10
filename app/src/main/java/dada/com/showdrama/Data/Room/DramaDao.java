@@ -2,6 +2,7 @@ package dada.com.showdrama.Data.Room;
 
 import androidx.paging.DataSource;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -16,7 +17,7 @@ import io.reactivex.Observable;
 public interface DramaDao {
 
     @Query("SELECT * FROM DRAMA")
-    public Observable<List<Drama>> getAll();
+    public abstract DataSource.Factory<Integer,Drama> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertDramasList(List<Drama> dramas);
@@ -30,7 +31,8 @@ public interface DramaDao {
     @Query("SELECT * FROM DRAMA WHERE dramaId=:dramaId")
     public Observable<Drama> getDramaById(String dramaId);
 
-
+    @Query("DELETE FROM drama")
+    public void deleteAll();
 
 
 }

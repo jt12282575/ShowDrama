@@ -1,9 +1,13 @@
 package dada.com.showdrama.Base;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import dada.com.showdrama.R;
 
 public abstract class MVPActivity<P extends BasePresenter> extends AppCompatActivity {
     protected P presenter;
@@ -19,6 +23,13 @@ public abstract class MVPActivity<P extends BasePresenter> extends AppCompatActi
     protected void onDestroy() {
         super.onDestroy();
         if(presenter != null) presenter.detachView();
+    }
+
+    public void setToolbar(String title,Toolbar toolbar){
+        if (toolbar != null) {
+            toolbar.setTitle(title);
+            setSupportActionBar(toolbar);
+        }
     }
 
 }

@@ -7,5 +7,31 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="TextInputLayoutHint">
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="myToolbarTheme"  parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textSize">24dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Theme.MyTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorHint">@color/text_color_primary</item>
+        <item name="android:editTextColor">@color/text_color_sub</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:actionBarWidgetTheme">@style/searchViewTheme</item>
+        <!-- your other custom styles -->
+    </style>
+
+    <style name="searchViewTheme">
+        <item name="android:colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <style name="Theme.MyTheme.Widget" parent="@android:style/Theme.Holo">
+        <item name="android:textColorHint">@color/text_color_primary</item>
+        <item name="android:editTextColor">@color/text_color_sub</item>
+        <!-- your other custom widget styles -->
+    </style>
 
 </resources>
