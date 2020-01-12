@@ -31,7 +31,7 @@ public interface DramaDao {
     @Query("SELECT * FROM DRAMA WHERE dramaId=:dramaId")
     public Observable<Drama> getDramaById(String dramaId);
 
-    @Query("DELETE FROM drama")
+    @Query("DELETE FROM DRAMA")
     public void deleteAll();
 
 

@@ -70,7 +70,8 @@ dependencies {
 
     // Paging
     implementation "android.arch.paging:runtime:$pagingVersion"
-    implementation "androidx.paging:paging-rxjava2:$pagingVersion" // For Kotlin use paging-rxjava2-ktx
+    implementation "androidx.paging:paging-rxjava2:$pagingVersion"
+    // For Kotlin use paging-rxjava2-ktx
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:1.0.0"
@@ -81,5 +82,8 @@ dependencies {
 
     // RxNetwork
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.2.0-alpha02'
 
 }

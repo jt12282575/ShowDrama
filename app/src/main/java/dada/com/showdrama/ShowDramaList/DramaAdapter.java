@@ -14,16 +14,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.R;
+import dada.com.showdrama.Util.UtilFunction;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaViewHolder> {
+    public static int imageWidth;
 
     protected DramaAdapter(@NonNull DiffUtil.ItemCallback<Drama> diffCallback) {
         super(diffCallback);
+    }
+
+    public void setImageWidth(int imageWidth){
+        this.imageWidth = imageWidth;
     }
 
     protected DramaAdapter(@NonNull AsyncDifferConfig<Drama> config) {
@@ -70,8 +81,10 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
             String rating=df.format(drama.getRating());
             tvDramaRating.setText(rating);
             materialRatingBar.setRating(drama.getRating().floatValue());
-            Picasso.get().load(drama.getThumb()).fit().placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb);
-            tvUploadDate.setText(drama.getCreatedAt());
+            Picasso.get().load(drama.getThumb()).resize(DramaAdapter.imageWidth,0).placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb);
+            tvUploadDate.setText("上傳日期 "+UtilFunction.fromISO8601UTC(drama.getCreatedAt()));
         }
     }
+
+
 }

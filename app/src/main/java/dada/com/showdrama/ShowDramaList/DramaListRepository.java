@@ -5,24 +5,16 @@ import androidx.paging.PagedList;
 import androidx.paging.RxPagedListBuilder;
 
 
-import com.google.gson.Gson;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 
 import dada.com.showdrama.Base.BaseContract;
-import dada.com.showdrama.Data.ApiClient;
-import dada.com.showdrama.Data.ApiStores;
+import dada.com.showdrama.Data.Retrofit.ApiClient;
+import dada.com.showdrama.Data.Retrofit.ApiStores;
 import dada.com.showdrama.Data.Room.DramaDao;
 import dada.com.showdrama.Data.Room.DramaDatabase;
 import dada.com.showdrama.Global;
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.Model.DramaPack;
-import dada.com.showdrama.R;
 import dada.com.showdrama.Util.Constant;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -45,11 +37,13 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
                 .setPrefetchDistance(PRE_FETCH_DISTANCE)
                 .setEnablePlaceholders(false)
                 .build();
-        final List<Drama> dramaList = new ArrayList<>();
-        /*for (int i = 0; i < 10; i++) {
-            dramaList.add(getDrama(i));
-        }*/
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dramaDao.deleteAll();
+            }
+        }).start();*/
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 InputStream raw =  Global.instance.getApplicationContext().getResources().openRawResource(R.raw.testdata);
@@ -59,7 +53,7 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
                 dramaDao.deleteAll();
                 dramaDao.insertDramasList(obj.getData());
             }
-        }).start();
+        }).start();*/
 
     }
 
@@ -85,6 +79,10 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
         DataSource.Factory<Integer,Drama> factory = getDramaDao().getPartialDramas(keyword);
         RxPagedListBuilder<Integer,Drama> rxPagedListBuilder = new RxPagedListBuilder(factory, config);
         return rxPagedListBuilder.buildObservable();
+    }
+
+    public void insertDataInDb(List<Drama> dramas){
+        getDramaDao().insertDramasList(dramas);
     }
 
 

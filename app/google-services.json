@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "545076913802",
+    "firebase_url": "https://showdrama-9334c.firebaseio.com",
+    "project_id": "showdrama-9334c",
+    "storage_bucket": "showdrama-9334c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545076913802:android:20b0517a3942127bffef73",
+        "android_client_info": {
+          "package_name": "dada.com.showdrama"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545076913802-7drvifphl1cua25de34s8ivor9ksd0dt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dada.com.showdrama",
+            "certificate_hash": "2d8c8c9c526cc9b2bab0ee2a822ed0b1a4b970c5"
+          }
+        },
+        {
+          "client_id": "545076913802-obkg2fo06inpg29th9g4bbcct2np1650.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJz6mhARaLZeQ1v1N9qBS_Jgawy6VDlOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545076913802-obkg2fo06inpg29th9g4bbcct2np1650.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

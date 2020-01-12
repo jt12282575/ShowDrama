@@ -1,7 +1,6 @@
 package dada.com.showdrama.ShowDramaList;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -10,29 +9,28 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.SearchManager;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.github.pwittchen.reactivenetwork.library.rx2.Connectivity;
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork;
-
-import java.util.List;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 
 import dada.com.showdrama.Base.MVPActivity;
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.R;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> implements IDramaListView {
     private static final String TAG = "dramalist_activity";
@@ -53,6 +51,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         setContentView(R.layout.activity_show_drama_list);
         initView();
         presenter.loadData();
+        presenter.updateDataFromNet();
     }
 
     private void initView() {
@@ -68,6 +67,10 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         rcv_dramalist = findViewById(R.id.sdl_rcv_dramalist);
         rcv_dramalist.setHasFixedSize(true);
         rcv_dramalist.setLayoutManager(new LinearLayoutManager(this));
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int imageWidth = (int) (metrics.widthPixels * 0.25);
+        Log.i(TAG, "initView: metric get width "+metrics.widthPixels+" imageWidth: "+imageWidth);
         dramaAdapter = new DramaAdapter(new DiffUtil.ItemCallback<Drama>() {
             @Override
             public boolean areItemsTheSame(@NonNull Drama oldItem, @NonNull Drama newItem) {
@@ -79,29 +82,28 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
                 return oldItem.equals(newItem);
             }
         });
+        dramaAdapter.setImageWidth(imageWidth);
         rcv_dramalist.setAdapter(dramaAdapter);
 
     }
+
 
 
     private SearchView.OnQueryTextListener onQueryTextListener =
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    getDealsFromDb(query);
+                    presenter.searchDramaFromKeyWord(query);
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    getDealsFromDb(newText);
+                    presenter.searchDramaFromKeyWord(newText);
                     return true;
                 }
 
-                private void getDealsFromDb(String searchText) {
-                    searchText = "%"+searchText+"%";
-                    Log.i(TAG, "Search Text: "+searchText);
-                }
+
             };
 
 
@@ -115,14 +117,17 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         Toast.makeText(this, "網路出現問題，請確認網路狀態", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public String getSearchKeyword() {
-        return null;
-    }
+
 
     @Override
-    public boolean checkSearchKeywordNotNull(String searchKeyword) {
-        return false;
+    public boolean ifDramaListHaveData() {
+        if(dramaAdapter == null){
+            return true;
+        }
+        if(dramaAdapter.getCurrentList().isEmpty()){
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -142,7 +147,39 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
 
 
     @Override
-    public Observable<Connectivity> getNetworkState() {
-        return ReactiveNetwork.observeNetworkConnectivity(this)   ;
+    public Observable<Boolean> getNetworkState() {
+        if(isConnected()){
+            Log.i(TAG, "getNetworkState: 有連線");
+        }else{
+            Log.i(TAG, "getNetworkState: 沒有連線");
+        }
+//        return ReactiveNetwork.observeNetworkConnectivity(this)   ;
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                try {
+                    int timeoutMs = 1500;
+                    Socket sock = new Socket();
+                    SocketAddress sockaddr = new InetSocketAddress("8.8.8.8", 53);
+
+                    sock.connect(sockaddr, timeoutMs);
+                    sock.close();
+                    Log.i(TAG, "subscribe: 有連線");
+                    emitter.onNext(true);
+                } catch (IOException e) {
+                    Log.i(TAG, "subscribe: 沒有連線");
+                    emitter.onNext(false);
+                }
+            }
+        });
+    }
+
+    private boolean isConnected(){
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 }

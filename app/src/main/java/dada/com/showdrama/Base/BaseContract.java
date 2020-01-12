@@ -17,7 +17,7 @@ public interface BaseContract {
         void showLoading();
         void hideLoading();
         void showNetworkError();
-        Observable<Connectivity> getNetworkState();
+        Observable<Boolean> getNetworkState();
     }
 
     interface IBasePresenter<V extends IBaseView>{

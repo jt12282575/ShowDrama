@@ -11,6 +11,5 @@ import dada.com.showdrama.Model.Drama;
 public interface IDramaListView extends BaseContract.IBaseView {
     void getDramasSuccess(PagedList<Drama> dramas);
     void getDramaFail(String msg);
-    String getSearchKeyword();
-    boolean checkSearchKeywordNotNull(String searchKeyword);
+    boolean ifDramaListHaveData();
 }

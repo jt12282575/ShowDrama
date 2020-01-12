@@ -1,4 +1,4 @@
-package dada.com.showdrama.Data;
+package dada.com.showdrama.Data.Retrofit;
 
 import io.reactivex.observers.DisposableObserver;
 import retrofit2.HttpException;
