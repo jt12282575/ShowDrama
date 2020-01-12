@@ -11,6 +11,7 @@ import java.util.List;
 
 import dada.com.showdrama.Model.Drama;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 
 @Dao
@@ -29,7 +30,7 @@ public interface DramaDao {
     public abstract DataSource.Factory<Integer,Drama> getPartialDramas(String keyword);
 
     @Query("SELECT * FROM DRAMA WHERE dramaId=:dramaId")
-    public Observable<Drama> getDramaById(String dramaId);
+    public Single<Drama> getDramaById(int dramaId);
 
     @Query("DELETE FROM DRAMA")
     public void deleteAll();

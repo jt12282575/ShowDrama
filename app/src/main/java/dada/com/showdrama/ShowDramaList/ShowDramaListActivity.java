@@ -82,6 +82,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
                 return oldItem.equals(newItem);
             }
         });
+        dramaAdapter.setActivity(this);
         dramaAdapter.setImageWidth(imageWidth);
         rcv_dramalist.setAdapter(dramaAdapter);
 
@@ -146,33 +147,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
     }
 
 
-    @Override
-    public Observable<Boolean> getNetworkState() {
-        if(isConnected()){
-            Log.i(TAG, "getNetworkState: 有連線");
-        }else{
-            Log.i(TAG, "getNetworkState: 沒有連線");
-        }
-//        return ReactiveNetwork.observeNetworkConnectivity(this)   ;
-        return Observable.create(new ObservableOnSubscribe<Boolean>() {
-            @Override
-            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
-                try {
-                    int timeoutMs = 1500;
-                    Socket sock = new Socket();
-                    SocketAddress sockaddr = new InetSocketAddress("8.8.8.8", 53);
 
-                    sock.connect(sockaddr, timeoutMs);
-                    sock.close();
-                    Log.i(TAG, "subscribe: 有連線");
-                    emitter.onNext(true);
-                } catch (IOException e) {
-                    Log.i(TAG, "subscribe: 沒有連線");
-                    emitter.onNext(false);
-                }
-            }
-        });
-    }
 
     private boolean isConnected(){
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

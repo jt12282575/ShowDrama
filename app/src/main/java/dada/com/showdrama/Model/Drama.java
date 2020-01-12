@@ -1,5 +1,8 @@
 package dada.com.showdrama.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -7,10 +10,10 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 @Entity(tableName = "DRAMA")
-public class Drama {
-
-
+public class Drama implements Serializable {
 
 
     @PrimaryKey
@@ -42,6 +45,10 @@ public class Drama {
     @SerializedName("rating")
     @Expose
     private Double rating;
+
+
+
+
 
     public Integer getDramaId() {
         return dramaId;
@@ -101,5 +108,6 @@ public class Drama {
         return drama.getDramaId() == this.getDramaId() &&
                 drama.getName().equals(this.getName());
     }
+
 
 }

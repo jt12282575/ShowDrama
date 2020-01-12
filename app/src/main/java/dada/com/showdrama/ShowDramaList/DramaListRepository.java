@@ -18,6 +18,7 @@ import dada.com.showdrama.Model.DramaPack;
 import dada.com.showdrama.Util.Constant;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> {
     protected static ApiStores apiStores;
@@ -66,6 +67,10 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
         drama.setRating(0.5);
         drama.setTotalViews(50);
         return drama;
+    }
+
+    public Single<Drama> getDramaFromDb(int did){
+        return dramaDao.getDramaById(did);
     }
 
     @Override

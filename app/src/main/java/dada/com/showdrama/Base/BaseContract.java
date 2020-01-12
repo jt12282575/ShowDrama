@@ -10,7 +10,9 @@ import java.util.List;
 
 import dada.com.showdrama.Model.DramaPack;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 
 public interface BaseContract {
     interface IBaseView{
@@ -25,6 +27,7 @@ public interface BaseContract {
         void detachView();
         void onUnSubScribe();
         <T> void addSubScribe(Observable<T> observable, DisposableObserver<T> disposableObserver);
+        <T> void addSubScribe(Single<T> observable, DisposableSingleObserver<T> disposableObserver);
         <T> void addSubScribe( DisposableObserver<T> disposableObserver);
     }
 

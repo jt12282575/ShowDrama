@@ -2,9 +2,11 @@ package dada.com.showdrama.Base;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public abstract class BasePresenter<V extends BaseContract.IBaseView> implements BaseContract.IBasePresenter<V> {
@@ -24,6 +26,16 @@ public abstract class BasePresenter<V extends BaseContract.IBaseView> implements
         observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(disposableObserver);
+
+    }
+
+    @Override
+    public <T> void addSubScribe(Single<T> single, DisposableSingleObserver<T> disposableSingleObserver) {
+        if(mCompositeDisposable == null) mCompositeDisposable = new CompositeDisposable();
+        mCompositeDisposable.add(disposableSingleObserver);
+        single.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(disposableSingleObserver);
 
     }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="dada.com.showdrama">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,16 +14,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyTheme">
-        <activity android:name=".ShowDramaDetail.ShowDramaDetailActivity"
+        <activity
+            android:name=".ShowDramaDetail.DramaDetailActivity"
             android:parentActivityName=".ShowDramaList.ShowDramaListActivity">
+
+            <tools:validation testUrl="http://www.example.com/dramas/1" />
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.example.com"
+                    android:pathPrefix="/dramas" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ShowDramaList.ShowDramaListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".ShowDramaList.ShowDramaListActivity">
-
         </activity>
         <activity android:name=".MainActivity"></activity>
     </application>

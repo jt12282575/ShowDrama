@@ -1,5 +1,10 @@
 package dada.com.showdrama.ShowDramaList;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.os.Bundle;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
@@ -23,14 +30,20 @@ import java.util.TimeZone;
 
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.R;
+import dada.com.showdrama.ShowDramaDetail.DramaDetailActivity;
 import dada.com.showdrama.Util.UtilFunction;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaViewHolder> {
     public static int imageWidth;
+    public Activity activity;
 
     protected DramaAdapter(@NonNull DiffUtil.ItemCallback<Drama> diffCallback) {
         super(diffCallback);
+    }
+
+    public void setActivity(Activity activity){
+        this.activity = activity;
     }
 
     public void setImageWidth(int imageWidth){
@@ -50,10 +63,24 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DramaViewHolder holder, int position) {
-        Drama drama = getItem(position);
+    public void onBindViewHolder(@NonNull final DramaViewHolder holder, int position) {
+        final Drama drama = getItem(position);
         if (drama != null) {
             holder.bindTo(drama);
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent mIntent = new Intent(holder.itemView.getContext(), DramaDetailActivity.class);
+                    Bundle mBundle = new Bundle();
+                    mBundle.putSerializable(DramaDetailActivity.DETAIL_DRAMA, drama);
+                    ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            activity
+                            , new Pair<View,String>(holder.ivThumb, "trans_thumb")
+                    );
+                    mIntent.putExtras(mBundle);
+                    holder.itemView.getContext().startActivity(mIntent,activityOptions.toBundle());
+                }
+            });
         }
     }
 
@@ -75,13 +102,18 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
             materialRatingBar = (MaterialRatingBar) itemView.findViewById(R.id.rcv_drama_rb_rating);
         }
 
-        public void bindTo(Drama drama) {
+        public void bindTo(final Drama drama) {
+
             tvDramaName.setText(drama.getName());
             DecimalFormat df=new DecimalFormat("#.#");
             String rating=df.format(drama.getRating());
             tvDramaRating.setText(rating);
             materialRatingBar.setRating(drama.getRating().floatValue());
-            Picasso.get().load(drama.getThumb()).resize(DramaAdapter.imageWidth,0).placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb);
+            materialRatingBar.setEnabled(false);
+            Picasso.get()
+                    .load(drama.getThumb())
+                    .resize(DramaAdapter.imageWidth,0)
+                    .placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb);
             tvUploadDate.setText("上傳日期 "+UtilFunction.fromISO8601UTC(drama.getCreatedAt()));
         }
     }
