@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -30,6 +32,9 @@ import dada.com.showdrama.Util.Constant;
 import dada.com.showdrama.Util.UtilFunction;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
+import static com.squareup.picasso.MemoryPolicy.NO_CACHE;
+import static com.squareup.picasso.MemoryPolicy.NO_STORE;
+
 public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> implements IDramaDetailView {
     private ImageView iv_drama;
     private Toolbar toolbar;
@@ -39,7 +44,8 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
     private TextView tvDramaCreateAt;
     private TextView tvTotalViews;
     private TextView tvRating;
-    MaterialRatingBar materialRatingBar;
+    private MaterialRatingBar materialRatingBar;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
     private String imageUrl = "https://i.pinimg.com/originals/61/d4/be/61d4be8bfc29ab2b6d5cab02f72e8e3b.jpg";
     public static String DETAIL_DRAMA = "detail_drama";
 
@@ -76,13 +82,14 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
         tvDramaName = findViewById(R.id.sdd_tv_drama_name);
         tvRating = findViewById(R.id.sdd_tv_rating);
         materialRatingBar = findViewById(R.id.sdd_rb_rating);
+        collapsingToolbarLayout = findViewById(R.id.sdd_collapsing);
 
         materialRatingBar.setEnabled(false);
 
         this.setSupportActionBar(toolbar);
         final ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
@@ -90,10 +97,12 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
 
                 if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                     //  Collapsed
+                    actionBar.setDisplayHomeAsUpEnabled(true);
                     actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
                 } else {
+                    actionBar.setDisplayHomeAsUpEnabled(false);
                     //Expanded
-                    actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+//                    actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
                 }
             }
         });
@@ -130,22 +139,11 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
             final DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
             Picasso.get().load(drama.getThumb())
-                    .networkPolicy(NetworkPolicy.OFFLINE)
                     .resize(metrics.widthPixels, 0)
+                    .memoryPolicy(NO_CACHE, NO_STORE)
+                    .config(Bitmap.Config.RGB_565)
                     .placeholder(R.drawable.ic_file_download_green_80dp)
-                    .into(iv_drama, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Picasso.get().load(drama.getThumb())
-                                    .resize(metrics.widthPixels, 0)
-                                    .into(iv_drama);
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-
-                        }
-                    });
+                    .into(iv_drama);
 
             materialRatingBar.setRating(drama.getRating().floatValue());
         }else{

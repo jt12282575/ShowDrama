@@ -1,5 +1,7 @@
 package dada.com.showdrama.ShowDramaList;
 
+import android.content.SharedPreferences;
+
 import androidx.paging.DataSource;
 import androidx.paging.PagedList;
 import androidx.paging.RxPagedListBuilder;
@@ -57,6 +59,8 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
         }).start();*/
 
     }
+
+
 
     public  Drama getDrama(int did){
         Drama drama = new Drama();

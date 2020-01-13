@@ -35,5 +35,8 @@ public interface DramaDao {
     @Query("DELETE FROM DRAMA")
     public void deleteAll();
 
+    @Query("SELECT * FROM DRAMA ORDER BY dramaId LIMIT 1")
+    Single<Drama> checkIfDatabaseEmpty();
+
 
 }

@@ -1,7 +1,10 @@
 package dada.com.showdrama.Base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -40,6 +43,8 @@ public abstract class MVPActivity<P extends BasePresenter> extends AppCompatActi
             setSupportActionBar(toolbar);
         }
     }
+
+
 
 
     public Observable<Boolean> getNetworkState() {

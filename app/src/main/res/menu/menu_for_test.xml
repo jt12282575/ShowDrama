@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        app:showAsAction="always"
+        android:title="選單">
+        <menu>
+            <item android:id="@+id/menu_setting"
+                android:title="清掉歷史紀錄SharedPreference"
+                android:visible="true"
+                app:showAsAction="never"/>
+        </menu>
+    </item>
+
+</menu>

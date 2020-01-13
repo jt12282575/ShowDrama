@@ -3,6 +3,8 @@ package dada.com.showdrama.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -108,6 +110,7 @@ public class Drama implements Serializable {
         return drama.getDramaId() == this.getDramaId() &&
                 drama.getName().equals(this.getName());
     }
+
 
 
 }

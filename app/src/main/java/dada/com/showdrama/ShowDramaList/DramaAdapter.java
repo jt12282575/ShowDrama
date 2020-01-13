@@ -3,6 +3,7 @@ package dada.com.showdrama.ShowDramaList;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -37,14 +40,19 @@ import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaViewHolder> {
     public static int imageWidth;
     public Activity activity;
+    private ItemClick itemClick;
+     Object picasso_tag;
 
-    protected DramaAdapter(@NonNull DiffUtil.ItemCallback<Drama> diffCallback) {
+    protected DramaAdapter(@NonNull DiffUtil.ItemCallback<Drama> diffCallback,Activity activity,ItemClick itemClick,Object picasso_tag) {
         super(diffCallback);
+        this.activity = activity;
+        this.itemClick = itemClick;
+        this.picasso_tag = picasso_tag;
     }
 
-    public void setActivity(Activity activity){
-        this.activity = activity;
-    }
+
+
+
 
     public void setImageWidth(int imageWidth){
         this.imageWidth = imageWidth;
@@ -63,13 +71,14 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final DramaViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final DramaViewHolder holder, final int position) {
         final Drama drama = getItem(position);
         if (drama != null) {
             holder.bindTo(drama);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    itemClick.onItemClick(v,position);
                     Intent mIntent = new Intent(holder.itemView.getContext(), DramaDetailActivity.class);
                     Bundle mBundle = new Bundle();
                     mBundle.putSerializable(DramaDetailActivity.DETAIL_DRAMA, drama);
@@ -84,7 +93,7 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
         }
     }
 
-    public static class DramaViewHolder extends RecyclerView.ViewHolder {
+    public  class DramaViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvDramaName;
         TextView tvDramaRating;
@@ -111,11 +120,33 @@ public class DramaAdapter extends PagedListAdapter<Drama, DramaAdapter.DramaView
             materialRatingBar.setRating(drama.getRating().floatValue());
             materialRatingBar.setEnabled(false);
             Picasso.get()
+
                     .load(drama.getThumb())
+                    .networkPolicy(NetworkPolicy.OFFLINE)
                     .resize(DramaAdapter.imageWidth,0)
-                    .placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb);
+                    .tag(picasso_tag)
+                    .config(Bitmap.Config.RGB_565)
+                    .placeholder(R.drawable.ic_file_download_green_80dp).into(ivThumb ,new Callback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Picasso.get().load(drama.getThumb())
+                            .resize(DramaAdapter.imageWidth, 0)
+                            .tag(picasso_tag)
+                            .config(Bitmap.Config.RGB_565)
+                            .into(ivThumb);
+                }
+            });
             tvUploadDate.setText("上傳日期 "+UtilFunction.fromISO8601UTC(drama.getCreatedAt()));
         }
+    }
+
+    interface ItemClick{
+        void onItemClick(View v, int position);
     }
 
 

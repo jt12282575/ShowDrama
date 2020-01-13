@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="test_string">
+        <item>武俠</item>
+        <item>女裝</item>
+        <item>可愛</item>
+        <item>警察</item>
+        <item>魔劍</item>
+        <item>富二代</item>
+    </string-array>
+</resources>

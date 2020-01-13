@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/sdl_rl_root"
+    android:focusableInTouchMode="true"
     tools:context=".ShowDramaList.ShowDramaListActivity">
     <include
         android:id="@+id/sdl_toolbar"
@@ -19,12 +21,20 @@
         android:indeterminateTint="@color/colorPrimary"
         android:layout_centerInParent="true"
         ></ProgressBar>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/sdl_rcv_dramalist"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/sdl_srl_rcvroot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/general_margin"
-        android:layout_below="@id/sdl_toolbar"></androidx.recyclerview.widget.RecyclerView>
+        android:paddingLeft="@dimen/general_margin"
+        android:paddingRight="@dimen/general_margin"
+        android:paddingBottom="@dimen/general_margin"
+        android:layout_below="@id/sdl_toolbar">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/sdl_rcv_dramalist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            ></androidx.recyclerview.widget.RecyclerView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
 </RelativeLayout>

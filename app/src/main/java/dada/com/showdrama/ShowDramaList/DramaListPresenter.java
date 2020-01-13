@@ -4,6 +4,8 @@ import android.util.Log;
 
 import androidx.paging.PagedList;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -21,6 +23,14 @@ public class DramaListPresenter extends BasePresenter<IDramaListView>{
         attachView(iView);
     }
     private static final String TAG = "dramalist_presenter";
+
+
+
+    public boolean initFromEndState(){
+        String lastquery = mvpView.getLastTimeQuery();
+        if (!lastquery.equals("")) return true;
+        return false;
+    }
 
     public void searchDramaFromKeyWord(String searchkey){
         if(checkSearchKeywordNotEnpty(searchkey)){
@@ -49,7 +59,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView>{
 
             addSubScribe(dramaListRepository.getDramaFromKeyWord(searchKeyInDb),dataObserver);
         }else{
-            loadData();
+            getAllDramaFromDb();
         }
     }
 
@@ -70,33 +80,17 @@ public class DramaListPresenter extends BasePresenter<IDramaListView>{
         addSubScribe(dramaListRepository.getDataRemote().doOnNext(new Consumer<DramaPack>() {
             @Override
             public void accept(DramaPack dramaPack) throws Exception {
+                Log.i(TAG, "accept: 先存進 db");
                 dramaListRepository.insertDataInDb(dramaPack.getData());
             }
         }), new ApiCallback<DramaPack>() {
             @Override
             public void onSuccess(DramaPack dramaPack) {
-                Log.i(TAG, "getData remote success: "+"size: "+dramaPack.getData().size());
+                Log.i(TAG, "accept: 後決定是否更新畫面");
                 if (!mvpView.ifDramaListHaveData()){
                     if (dramaPack.getData()!= null) return;
                     if (dramaPack.getData().size()> 0 ) {
-                        int initPageSize = (dramaPack.getData().size()>Constant.PAGESIZE)
-                                ? Constant.PAGESIZE :dramaPack.getData().size();
-
-                        PagedList.Config myConfig = new PagedList.Config.Builder()
-                                .setEnablePlaceholders(false)
-                                .setInitialLoadSizeHint(initPageSize)
-                                .setPageSize(Constant.PAGESIZE)
-                                .build();
-                        List<Drama> dramas = dramaPack.getData();
-                        Log.i(TAG, "Current thread" + Thread.currentThread());
-                        DramaListProvider provider = new DramaListProvider(dramas);
-                        DramaDataSource dataSource = new DramaDataSource(provider);
-
-                        PagedList<Drama> pagedDramas = new PagedList.Builder<Integer, Drama>(dataSource, myConfig)
-                                .setInitialKey(0)
-                                .setFetchExecutor(Executors.newSingleThreadExecutor())
-                                .setNotifyExecutor(new MainThreadExecutor())
-                                .build();
+                        PagedList<Drama> pagedDramas = getDramas(dramaPack);
                         mvpView.getDramasSuccess(pagedDramas);
                         Log.i(TAG, "update data from net");
                     }
@@ -111,12 +105,40 @@ public class DramaListPresenter extends BasePresenter<IDramaListView>{
 
             @Override
             public void onFinish() {
-
+                mvpView.finishRefresh();
             }
         });
     }
 
-    public void loadData(){
+    @NotNull
+    private PagedList<Drama> getDramas(DramaPack dramaPack) {
+        int initPageSize = (dramaPack.getData().size()> Constant.PAGESIZE)
+                ? Constant.PAGESIZE :dramaPack.getData().size();
+
+        PagedList.Config myConfig = new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setInitialLoadSizeHint(initPageSize)
+                .setPageSize(Constant.PAGESIZE)
+                .build();
+        List<Drama> dramas = dramaPack.getData();
+        DramaListProvider provider = new DramaListProvider(dramas);
+        DramaDataSource dataSource = new DramaDataSource(provider);
+
+        return new PagedList.Builder<Integer, Drama>(dataSource, myConfig)
+                .setInitialKey(0)
+                .setFetchExecutor(Executors.newSingleThreadExecutor())
+                .setNotifyExecutor(new MainThreadExecutor())
+                .build();
+    }
+
+    public void loadDramaData(){
+        String lastQuery = mvpView.getLastTimeQuery();
+        mvpView.setLastQuery(lastQuery);
+        updateDataFromNet();
+
+    }
+
+    private void getAllDramaFromDb() {
         if (dramaListRepository == null) dramaListRepository = new DramaListRepository();
         mvpView.showLoading();
         DisposableObserver dataObserver = new DisposableObserver<PagedList<Drama>>() {
@@ -140,42 +162,6 @@ public class DramaListPresenter extends BasePresenter<IDramaListView>{
         };
 
         addSubScribe(dramaListRepository.getDatalocal(),dataObserver);
-
-        /*mvpView.getNetworkState().flatMap(new Function<Boolean, ObservableSource<PagedList<Drama>>>() {
-            @Override
-            public ObservableSource<PagedList<Drama>> apply(Boolean isConnected) throws Exception {
-                if (isConnected){
-                    Log.i(TAG, "從網路讀資料: ");
-                    return dramaListRepository.getDataRemote().map(new Function<DramaPack, PagedList<Drama>>() {
-                        @Override
-                        public PagedList<Drama> apply(DramaPack dramaPack) throws Exception {
-
-                            PagedList.Config myConfig = new PagedList.Config.Builder()
-                                    .setInitialLoadSizeHint(Constant.PAGESIZE)
-                                    .setPageSize(Constant.PAGESIZE)
-                                    .build();
-                            List<Drama> dramas = dramaPack.getData();
-                            DramaListProvider provider = new DramaListProvider(dramas);
-                            DramaDataSource dataSource = new DramaDataSource(provider);
-                            PagedList<Drama> pagedDramas = new PagedList.Builder<Integer, Drama>(dataSource, myConfig)
-                                    .setInitialKey(0)
-                                    .build();
-
-                            return pagedDramas;
-                        }
-                    });
-                }else{
-                    Log.i(TAG, "從本地讀資料: ");
-                    return dramaListRepository.getDatalocal();
-                }
-
-            }
-        })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(dataObserver);*/
-
-
     }
 
 }

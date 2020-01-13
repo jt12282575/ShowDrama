@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:iconifiedByDefault="false"
-        android:queryHint="搜尋"
+        android:queryHint="搜尋劇名"
         android:layout_marginLeft="64dp"
         app:searchIcon="@drawable/ic_search_black_24dp"
         app:closeIcon="@drawable/ic_close_black_24dp" />

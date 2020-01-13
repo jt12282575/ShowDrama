@@ -1,76 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="240dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:minHeight="240dp">
+
     <ImageView
         android:id="@+id/rcv_drama_iv_thumb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/general_margin"
-        android:layout_marginBottom="@dimen/general_margin"
-        android:layout_marginTop="@dimen/general_margin"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/general_margin"
+        android:layout_marginTop="@dimen/general_margin"
+        android:layout_marginBottom="@dimen/general_margin"
         android:src="@drawable/ic_file_download_green_80dp"
-        ></ImageView>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></ImageView>
+
     <TextView
         android:id="@+id/rcv_drama_tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/larger_margin"
-        android:layout_toRightOf="@id/rcv_drama_iv_thumb"
-        android:layout_marginLeft="@dimen/general_margin"
-        android:text="戲劇名稱"
-        android:textSize="24dp"
-        android:textColor="@color/text_color_primary"
-        android:textStyle="bold"
-        android:inputType="text"
         android:ellipsize="end"
-        android:layout_marginRight="@dimen/general_margin"
-        ></TextView>
+        android:inputType="text"
+        android:text="戲劇名稱"
+        android:textColor="@color/text_color_primary"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/rcv_drama_tv_rating"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="@dimen/larger_margin"
+        app:layout_constraintLeft_toRightOf="@id/rcv_drama_iv_thumb"></TextView>
+
     <TextView
         android:id="@+id/rcv_drama_tv_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rcv_drama_tv_name"
-        android:layout_marginTop="@dimen/larger_margin"
-        android:layout_toRightOf="@id/rcv_drama_iv_thumb"
-        android:layout_marginLeft="@dimen/general_margin"
         android:text="5.0"
-        android:textSize="24dp"
         android:textColor="@color/colorPrimaryDark"
-        android:layout_marginRight="@dimen/general_margin"
-        ></TextView>
+        android:textSize="24dp"
+        android:layout_marginLeft="@dimen/larger_margin"
+        app:layout_constraintLeft_toRightOf="@id/rcv_drama_iv_thumb"
+        app:layout_constraintBottom_toTopOf="@+id/rcv_drama_tv_updatingdate"
+        app:layout_constraintTop_toBottomOf="@+id/rcv_drama_tv_name"
+        tools:layout_editor_absoluteX="236dp"></TextView>
+
     <me.zhanghai.android.materialratingbar.MaterialRatingBar
         android:id="@+id/rcv_drama_rb_rating"
+        style="@style/Widget.MaterialRatingBar.RatingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/rcv_drama_tv_name"
-        android:layout_marginTop="@dimen/larger_margin"
-        android:layout_toRightOf="@id/rcv_drama_tv_rating"
-        android:layout_marginLeft="@dimen/small_margin"
-        style="@style/Widget.MaterialRatingBar.RatingBar"
+        android:layout_marginLeft="4dp"
         android:rating="3.3"
         android:stepSize="0.1"
-        app:mrb_secondaryProgressTint="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="@id/rcv_drama_tv_rating"
+        app:layout_constraintLeft_toRightOf="@id/rcv_drama_tv_rating"
+        app:layout_constraintTop_toTopOf="@id/rcv_drama_tv_rating"
+        app:layout_constraintVertical_bias="0.6"
         app:mrb_indeterminateTint="@color/colorPrimaryDark"
-        app:mrb_progressTint="@color/colorPrimaryDark"
         app:mrb_progressBackgroundTint="@color/colorPrimaryDark"
-        ></me.zhanghai.android.materialratingbar.MaterialRatingBar>
+        app:mrb_progressTint="@color/colorPrimaryDark"
+        app:mrb_secondaryProgressTint="@color/colorPrimaryDark"></me.zhanghai.android.materialratingbar.MaterialRatingBar>
+
     <TextView
         android:id="@+id/rcv_drama_tv_updatingdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rcv_drama_tv_rating"
-        android:layout_marginTop="@dimen/larger_margin"
-        android:layout_marginBottom="@dimen/general_margin"
-        android:layout_toRightOf="@id/rcv_drama_iv_thumb"
-        android:layout_marginLeft="@dimen/general_margin"
         android:text="上傳日期"
-        android:textSize="16dp"
         android:textColor="@color/text_color_sub"
-        android:layout_marginRight="@dimen/general_margin"
-        ></TextView>
+        android:textSize="16dp"
+        android:layout_marginLeft="@dimen/larger_margin"
+        app:layout_constraintLeft_toRightOf="@id/rcv_drama_iv_thumb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rcv_drama_tv_rating"
+        tools:layout_editor_absoluteX="236dp"></TextView>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
