@@ -43,4 +43,29 @@
         <item name="android:scrollHorizontally">true</item>
     </style>
 
+    <style name="small_rating" parent="Widget.MaterialRatingBar.RatingBar">
+        <item name="android:minHeight">12dp</item>
+        <item name="android:minWidth">12dp</item>
+    </style>
+
+    <style name="general_rating" parent="Widget.MaterialRatingBar.RatingBar">
+    <item name="android:minHeight">24dp</item>
+    <item name="android:minWidth">24dp</item>
+</style>
+
+    <style name="general_big_rating" parent="Widget.MaterialRatingBar.RatingBar">
+        <item name="android:minHeight">32dp</item>
+        <item name="android:minWidth">32dp</item>
+    </style>
+
+    <style name="large_rating" parent="Widget.MaterialRatingBar.RatingBar">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+    </style>
+
+    <style name="xlarge_rating" parent="Widget.MaterialRatingBar.RatingBar">
+        <item name="android:minHeight">60dp</item>
+        <item name="android:minWidth">60dp</item>
+    </style>
+
 </resources>

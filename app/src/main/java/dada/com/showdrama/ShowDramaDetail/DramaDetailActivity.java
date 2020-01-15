@@ -132,33 +132,21 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
 
     }
 
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            Intent intent = new Intent(DramaDetailActivity.this,ShowDramaListActivity.class);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
 
-    /*@Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(DramaDetailActivity.this,ShowDramaListActivity.class);
-        startActivity(intent);
-
-    }*/
 
     @Override
     public void setDrama(final Drama drama) {
         if(drama!=null){
             tvDramaName.setText(drama.getName());
-            tvTotalViews.setText("觀看次數 "+ drama.getTotalViews()+" 次");
+            if(drama.getTotalViews()> 100000) tvTotalViews.setText("觀看次數 "+ (drama.getTotalViews()/10000)+" 萬次");
+            else tvTotalViews.setText("觀看次數 "+ drama.getTotalViews()+" 次");
             tvDramaCreateAt.setText("上傳時間 "+ UtilFunction.fromISO8601UTC(drama.getCreatedAt()));
 
             DecimalFormat df=new DecimalFormat("#.#");
             String rating=df.format(drama.getRating());
             tvRating.setText(rating);
+
+
 
             final DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);

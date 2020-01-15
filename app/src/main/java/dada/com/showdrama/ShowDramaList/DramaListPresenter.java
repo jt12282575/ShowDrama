@@ -23,9 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import dada.com.showdrama.Base.BasePresenter;
-import dada.com.showdrama.Data.Paging.DramaDataSource;
-import dada.com.showdrama.Data.Paging.DramaListProvider;
-import dada.com.showdrama.Data.Paging.MainThreadExecutor;
+
 import dada.com.showdrama.Data.Retrofit.ApiCallback;
 import dada.com.showdrama.Global;
 import dada.com.showdrama.Model.Drama;
@@ -66,11 +64,12 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
             @Override
             public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
                 dramaListRepository.cleanDb();
+                emitter.onNext(true);
             }
-        }), new DisposableObserver<Boolean>() {
+        }).delay(500,TimeUnit.MILLISECONDS), new DisposableObserver<Boolean>() {
             @Override
             public void onNext(Boolean aBoolean) {
-
+                mvpView.updateDramaList(new ArrayList<Drama>());
             }
 
             @Override
@@ -85,11 +84,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
         });
     }
 
-    public boolean initFromEndState() {
-        String lastquery = mvpView.getLastTimeQuery();
-        if (!lastquery.equals("")) return true;
-        return false;
-    }
+
 
     public void initData() {
         if (dramaListRepository == null) dramaListRepository = new DramaListRepository();
@@ -106,7 +101,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
                     @Override
                     public void onNext(Drama drama) {
                         Log.i(DATATAG, "資料庫有資料");
-
+                        loadDramaData();
                     }
 
                     @Override
@@ -276,7 +271,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
         Log.i(DATATAG, "data size: "+dramaList.size());
         final List<Drama> fakeList = new ArrayList<>();
         fakeList.clear();
-        for (int i = 13; i <20 ; i++) {
+        for (int i = 13; i <10000 ; i++) {
             Drama fakeDrama = new Drama();
             Drama drama = dramaList.get(i%6);
             fakeDrama.setDramaId(i);
