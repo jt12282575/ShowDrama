@@ -7,7 +7,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.paging.PagedList;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -51,7 +50,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
     private SearchView.SearchAutoComplete searchAutoComplete;
     private ProgressBar pbLoading;
     private RecyclerView rcv_dramalist;
-    private DramaAdapter dramaAdapter;
+
     private RelativeLayout rl_root;
     private SwipeRefreshLayout srl_rcv_root;
 
@@ -59,9 +58,13 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
     private String LAST_QUERY = "last_query";
     private String LAST_HISTORY = "last_history";
 
+    private String DATATAG = "datasource";
+
     private SimpleCursorAdapter suggestionAdapter;
     private List<String> historyWords = new ArrayList<String>();
     private Set<String> historySet = new HashSet<String>();
+    private List<Drama> dramaList = new ArrayList<>();
+    private DramaAdapter dramaAdapter;
 
     private static final String[] SUGGESTIONS = {
             "獅子", "黑", "妹妹",
@@ -72,19 +75,23 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
     private Object picasso_tag;
     private LinearLayoutManager linearLayoutManager;
     private boolean isUserScrolling = false;
-    DramaItemCallback dramaItemCallback = new DramaItemCallback();
+
+
+
 
     @Override
     protected DramaListPresenter createPresenter() {
-        return new DramaListPresenter(this);
+        return new DramaListPresenter(this,getApplication());
     }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_drama_list);
         initView();
-        presenter.loadDramaData();
+        presenter.initData();
     }
 
     private void initView() {
@@ -109,23 +116,26 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         linearLayoutManager = new LinearLayoutManager(this);
         rcv_dramalist.setLayoutManager(linearLayoutManager);
         DisplayMetrics metrics = new DisplayMetrics();
+
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int imageWidth = (int) (metrics.widthPixels * 0.25);
 
         picasso_tag = new Object();
 
-        dramaAdapter = new DramaAdapter(dramaItemCallback.getDramaItemCallBack(), this
+
+
+
+
+        dramaAdapter = new DramaAdapter(this, this
                 , new DramaAdapter.ItemClick() {
             @Override
             public void onItemClick(View v, int position) {
-                //存 目前 關鍵字
                 hideKeyboard();
                 Log.i(TAG, "onItemClick: 按下列表");
                 addHistoryWords();
             }
-        },picasso_tag);
-        dramaAdapter.setImageWidth(imageWidth);
-        dramaAdapter.setHasStableIds(true);
+        }, picasso_tag,dramaList,imageWidth);
+
         rcv_dramalist.setAdapter(dramaAdapter);
         rcv_dramalist.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -161,12 +171,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         srl_rcv_root.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (getCurrentQuery().equals("")){
-                    Log.i(TAG, "onRefresh: 觸發網路重拉資料");
-                    presenter.updateDataFromNet();
-                }else{
-                    finishRefresh();
-                }
+                presenter.updateDataFromNet();
             }
         });
 
@@ -178,13 +183,15 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    presenter.searchDramaFromKeyWord(query);
+
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
+
                     presenter.searchDramaFromKeyWord(newText);
+
                     return true;
                 }
 
@@ -194,7 +201,8 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
 
     @Override
     public void getDramasSuccess(PagedList<Drama> dramas) {
-        dramaAdapter.submitList(dramas);
+
+//        dramaAdapterPaging.submitList(dramas);
     }
 
     @Override
@@ -204,16 +212,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
 
 
 
-    @Override
-    public boolean ifDramaListHaveData() {
-        if(dramaAdapter == null){
-            return true;
-        }
-        if(dramaAdapter.getCurrentList().isEmpty()){
-            return false;
-        }
-        return true;
-    }
+
 
     @Override
     protected void onResume() {
@@ -293,10 +292,7 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
         return searchView.getQuery().toString();
     }
 
-    @Override
-    public PagedList<Drama> getCurrentPage() {
-        return dramaAdapter.getCurrentList();
-    }
+
 
     @Override
     public String getLastTimeQuery() {
@@ -383,29 +379,31 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
             historyWords.add(getCurrentQuery());
             historySet.add(getCurrentQuery());
             Log.i(TAG, "加入 "+getCurrentQuery());
-//            suggestionUpdate();
+
         }
     }
+
+
+    @Override
+    public synchronized void updateDramaList(List<Drama> dramaList) {
+        Log.i(DATATAG, "Activity: 更新 size "+dramaList.size());
+        for (int i = 0; i < dramaList.size(); i++) {
+            Log.i(DATATAG, "id: "+dramaList.get(i).getDramaId()+" name: "+dramaList.get(i).getName());
+        }
+
+        dramaAdapter.setDramaList(dramaList);
+        dramaAdapter.notifyDataSetChanged();
+        rcv_dramalist.invalidate();
+    }
+
+
+
 
     private boolean inHistory(String historyWords) {
         return historySet.contains(historyWords);
     }
 
-    private void suggestionUpdate() {
-        Log.i(TAG, "suggestionUpdate: ");
-        if (cursor!= null){
-            cursor.moveToPosition(-1);
-            String[] temp = new String[2];
-            int id = 0;
 
-            for(String item : historyWords){
-                temp[0] = Integer.toString(id++);
-                temp[1] = item;
-                cursor.addRow(temp);
-            }
-            suggestionAdapter.notifyDataSetChanged();
-        }
-    }
 
 
     @Override
@@ -434,13 +432,21 @@ public class ShowDramaListActivity extends MVPActivity<DramaListPresenter> imple
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         int id = item.getItemId();
-        if(id == R.id.menu_setting){
-            SharedPreferences pref = getSharedPreferences(DRAMA_LIST, MODE_PRIVATE);
-            pref.edit().putString(LAST_HISTORY,"").commit();
-            historySet.clear();
-            historyWords.clear();
-            return true;
+        switch (id){
+            case R.id.menu_setting:
+                SharedPreferences pref = getSharedPreferences(DRAMA_LIST, MODE_PRIVATE);
+                pref.edit().putString(LAST_HISTORY,"").commit();
+                historySet.clear();
+                historyWords.clear();
+                break;
+            case R.id.menu_cleandb:
+                presenter.cleanDb();
+                break;
+            case R.id.menu_db_add:
+                presenter.addDataInToDb();
+                break;
         }
+
         return true;
     }
 

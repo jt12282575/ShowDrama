@@ -11,6 +11,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -36,6 +39,8 @@ import static com.squareup.picasso.MemoryPolicy.NO_CACHE;
 import static com.squareup.picasso.MemoryPolicy.NO_STORE;
 
 public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> implements IDramaDetailView {
+
+    // ------ View -----------
     private ImageView iv_drama;
     private Toolbar toolbar;
     private AppBarLayout appBarLayout;
@@ -46,14 +51,19 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
     private TextView tvRating;
     private MaterialRatingBar materialRatingBar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private FloatingActionButton fabBack;
+
+
     private String imageUrl = "https://i.pinimg.com/originals/61/d4/be/61d4be8bfc29ab2b6d5cab02f72e8e3b.jpg";
     public static String DETAIL_DRAMA = "detail_drama";
 
     private static final String TAG = "DramaDetailActivity";
 
+    private int screenWidth = 0;
+
     @Override
     protected DramaDetailPresenter createPresenter() {
-        return new DramaDetailPresenter(this);
+        return new DramaDetailPresenter(this,getApplication());
     }
 
     @Override
@@ -83,12 +93,17 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
         tvRating = findViewById(R.id.sdd_tv_rating);
         materialRatingBar = findViewById(R.id.sdd_rb_rating);
         collapsingToolbarLayout = findViewById(R.id.sdd_collapsing);
+        fabBack = findViewById(R.id.sdd_fab_back);
+
+        ViewGroup.LayoutParams lp = iv_drama.getLayoutParams();
+
 
         materialRatingBar.setEnabled(false);
 
         this.setSupportActionBar(toolbar);
         final ActionBar actionBar = this.getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
+
 
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -106,6 +121,15 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
                 }
             }
         });
+
+        fabBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fabBack.setVisibility(View.GONE);
+                DramaDetailActivity.super.onBackPressed();
+            }
+        });
+
     }
 
     /*@Override
@@ -142,7 +166,7 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
                     .resize(metrics.widthPixels, 0)
                     .memoryPolicy(NO_CACHE, NO_STORE)
                     .config(Bitmap.Config.RGB_565)
-                    .placeholder(R.drawable.ic_file_download_green_80dp)
+                    .placeholder(R.color.colorPrimaryDark)
                     .into(iv_drama);
 
             materialRatingBar.setRating(drama.getRating().floatValue());
@@ -171,6 +195,8 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
     public void showNetworkError() {
         Toast.makeText(this, "目前沒有網路服務，請重新嘗試。", Toast.LENGTH_SHORT).show();
     }
+
+
 
 
 }

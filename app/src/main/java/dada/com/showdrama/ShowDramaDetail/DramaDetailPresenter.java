@@ -1,9 +1,11 @@
 package dada.com.showdrama.ShowDramaDetail;
 
+import android.app.Application;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.paging.PagedList;
 
 import dada.com.showdrama.Base.BasePresenter;
@@ -17,7 +19,8 @@ public class DramaDetailPresenter extends BasePresenter<IDramaDetailView> {
     private DramaListRepository dramaListRepository;
     private static final String TAG = "DramaDetailPresenter";
 
-    public DramaDetailPresenter(IDramaDetailView iView) {
+    public DramaDetailPresenter(IDramaDetailView iView,@NonNull Application application) {
+        super(application);
         attachView(iView);
     }
     public void getDrama(Intent intent) {
@@ -66,6 +69,7 @@ public class DramaDetailPresenter extends BasePresenter<IDramaDetailView> {
 
 
     }
+
 
 
 }

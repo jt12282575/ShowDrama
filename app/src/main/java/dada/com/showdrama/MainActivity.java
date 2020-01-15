@@ -33,18 +33,6 @@ public class MainActivity extends AppCompatActivity {
         Gson gson = new Gson();
         DramaPack obj = gson.fromJson(rd, DramaPack.class);
         Log.i(TAG, "gson size: "+Integer.toString(obj.getData().size()));*/
-        btn_test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dramaListRepository.getDatalocal().subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<List<Drama>>() {
-                            @Override
-                            public void accept(List<Drama> dramas) throws Exception {
-                                Log.i(TAG, "accept: size:"+ Integer.toString(dramas.size()));
-                            }
-                        });
-            }
-        });
+
     }
 }

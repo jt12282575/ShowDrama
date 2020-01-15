@@ -2,6 +2,7 @@ package dada.com.showdrama.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -100,16 +101,7 @@ public class Drama implements Serializable {
         this.rating = rating;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
 
-        Drama drama = (Drama) obj;
-
-        return drama.getDramaId() == this.getDramaId() &&
-                drama.getName().equals(this.getName());
-    }
 
 
 

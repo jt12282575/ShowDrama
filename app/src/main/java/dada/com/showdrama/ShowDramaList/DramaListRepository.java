@@ -1,7 +1,9 @@
 package dada.com.showdrama.ShowDramaList;
 
-import android.content.SharedPreferences;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 import androidx.paging.DataSource;
 import androidx.paging.PagedList;
 import androidx.paging.RxPagedListBuilder;
@@ -19,6 +21,7 @@ import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.Model.DramaPack;
 import dada.com.showdrama.Util.Constant;
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -28,67 +31,50 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
 
 
     private static final String TAG = "DramaListRepository";
+    private static final String DATATAG = "datasource";
     private PagedList.Config config;
-    private int PAGE_SIZE = Constant.PAGESIZE;
-    private int PRE_FETCH_DISTANCE = Constant.PRE_FETCH_DISTANCE;
+    private int PAGE_SIZE = 12;
+    private int PRE_FETCH_DISTANCE = 3;
 
     public DramaListRepository() {
         dramaDao = getDramaDao();
         config = new PagedList.Config.Builder()
                 .setPageSize(PAGE_SIZE)
-                .setInitialLoadSizeHint(PAGE_SIZE)
                 .setPrefetchDistance(PRE_FETCH_DISTANCE)
-                .setEnablePlaceholders(false)
                 .build();
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dramaDao.deleteAll();
-            }
-        }).start();*/
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                InputStream raw =  Global.instance.getApplicationContext().getResources().openRawResource(R.raw.testdata);
-                Reader rd = new BufferedReader(new InputStreamReader(raw));
-                Gson gson = new Gson();
-                DramaPack obj = gson.fromJson(rd, DramaPack.class);
-                dramaDao.deleteAll();
-                dramaDao.insertDramasList(obj.getData());
-            }
-        }).start();*/
+
 
     }
 
 
 
-    public  Drama getDrama(int did){
-        Drama drama = new Drama();
-        drama.setDramaId(did);
-        drama.setName("dd");
-        drama.setThumb("pic");
-        drama.setCreatedAt("at");
-        drama.setRating(0.5);
-        drama.setTotalViews(50);
-        return drama;
-    }
+
 
     public Single<Drama> getDramaFromDb(int did){
         return dramaDao.getDramaById(did);
     }
 
-    @Override
-    public Observable<PagedList<Drama>> getDatalocal() {
-        DataSource.Factory<Integer,Drama> factory = getDramaDao().getAll();
-        RxPagedListBuilder<Integer,Drama> rxPagedListBuilder = new RxPagedListBuilder(factory, config);
-        return rxPagedListBuilder.buildObservable();
+    public Single<Drama> checkIfDbHasDrama(){
+        Log.i(TAG, "checkIfDbHasDrama: 目前 Thread " +Thread.currentThread().getName());
+        return dramaDao.checkIfDatabaseEmpty();
     }
 
-    public Observable<PagedList<Drama>> getDramaFromKeyWord(String keyword){
-        DataSource.Factory<Integer,Drama> factory = getDramaDao().getPartialDramas(keyword);
-        RxPagedListBuilder<Integer,Drama> rxPagedListBuilder = new RxPagedListBuilder(factory, config);
-        return rxPagedListBuilder.buildObservable();
+    public void cleanDb(){
+        getDramaDao().deleteAll();
     }
+
+
+
+
+
+    public Maybe<List<Drama>> getDramaListFromKeyWord(String keyword){
+        return getDramaDao().searchDramasList(keyword);
+    }
+
+    public Single<List<Drama>> getAllDrama(){
+        return getDramaDao().getAllDrama();
+    }
+
 
     public void insertDataInDb(List<Drama> dramas){
         getDramaDao().insertDramasList(dramas);
@@ -96,6 +82,9 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
 
 
     public Observable<DramaPack> getDataRemote() {
+
+        Log.i(DATATAG, "getDataRemote: 從網路取資料");
+        Log.i(DATATAG, "目前thread: "+Thread.currentThread().getName());
         return apiStores().getDramaPack();
     }
 
@@ -119,6 +108,8 @@ public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> 
         if (apiStores == null) apiStores = ApiClient.retrofit().create(ApiStores.class);
         return apiStores;
     }
+
+
 
 
 }
