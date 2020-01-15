@@ -72,6 +72,7 @@ public class DramaAdapter extends RecyclerView.Adapter<DramaAdapter.DramaViewHol
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                itemClick.onItemClick(v,position);
                 Intent mIntent = new Intent(holder.itemView.getContext(), DramaDetailActivity.class);
                 Bundle mBundle = new Bundle();
                 mBundle.putSerializable(DramaDetailActivity.DETAIL_DRAMA, drama);
