@@ -26,3 +26,6 @@
 
 * 清空 SharedPreference
 
+測試 APK 下載連結
+
+https://drive.google.com/file/d/1mYscYifkS3aS5yilrkqqpbIaCfijarO2/view?usp=sharing
