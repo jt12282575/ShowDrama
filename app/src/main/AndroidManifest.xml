@@ -18,7 +18,6 @@
             android:name=".ShowDramaDetail.DramaDetailActivity"
             android:parentActivityName=".ShowDramaList.ShowDramaListActivity">
 
-            <tools:validation testUrl="http://www.example.com/dramas/1" />
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -38,7 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

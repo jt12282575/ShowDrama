@@ -132,6 +132,15 @@ public class DramaDetailActivity extends MVPActivity<DramaDetailPresenter> imple
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                DramaDetailActivity.super.onBackPressed();
+                break;
+        }
+        return true;
+    }
 
 
     @Override

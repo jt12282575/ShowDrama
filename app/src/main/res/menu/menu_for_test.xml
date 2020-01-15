@@ -17,7 +17,7 @@
                 app:showAsAction="never"/>
             <item android:id="@+id/menu_db_add"
                 android:title="資料庫加入資料"
-                android:visible="true"
+                android:visible="false"
                 app:showAsAction="never"/>
         </menu>
     </item>

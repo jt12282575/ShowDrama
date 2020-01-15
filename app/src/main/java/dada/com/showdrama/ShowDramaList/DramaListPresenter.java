@@ -4,10 +4,6 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.DialogTitle;
-import androidx.lifecycle.LiveData;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 
 import com.google.gson.Gson;
 
@@ -19,7 +15,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import dada.com.showdrama.Base.BasePresenter;
@@ -29,7 +24,8 @@ import dada.com.showdrama.Global;
 import dada.com.showdrama.Model.Drama;
 import dada.com.showdrama.Model.DramaPack;
 import dada.com.showdrama.R;
-import dada.com.showdrama.Util.Constant;
+import dada.com.showdrama.Repositary.DramaRepository;
+import dada.com.showdrama.RxRelative.RxUnit;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -44,7 +40,8 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class DramaListPresenter extends BasePresenter<IDramaListView> {
-    private DramaListRepository dramaListRepository;
+    private DramaRepository dramaRepository;
+    private RxUnit rxUnit = new RxUnit();
 
 
     public DramaListPresenter(IDramaListView iView, @NonNull Application application) {
@@ -63,7 +60,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
         addSubScribe(Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
-                dramaListRepository.cleanDb();
+                dramaRepository.cleanDb();
                 emitter.onNext(true);
             }
         }).delay(500,TimeUnit.MILLISECONDS), new DisposableObserver<Boolean>() {
@@ -87,66 +84,49 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
 
 
     public void initData() {
-        if (dramaListRepository == null) dramaListRepository = new DramaListRepository();
-        dramaListRepository.checkIfDbHasDrama() // 檢查 Local Db 是否為空
+        if (dramaRepository == null) dramaRepository = new DramaRepository();
+        dramaRepository.checkIfDbHasDrama() // 檢查 Local Db 是否為空
                 .toObservable()
                 .onErrorResumeNext(
-                        dramaListRepository.getDataRemote() //若 Local Db 為空，透過 Retrofit 去取得 data
-                                .retryWhen(doRetry(6, 5000)) // 如果 Retrofit 取 data 失敗，做重連
+                        dramaRepository.getDataRemote() //若 Local Db 為空，透過 Retrofit 去取得 data
+                                .retryWhen(rxUnit.doRetry(6, 5000)) // 如果 Retrofit 取 data 失敗，做重連
                                 .flatMap(insertDataToDb()) // 重連成功，資料存進 Local
                 )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<Drama>() {
-                    @Override
-                    public void onNext(Drama drama) {
-                        Log.i(DATATAG, "資料庫有資料");
-                        loadDramaData();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.i(DATATAG, "onError: " + e.getMessage().toString());
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mvpView.hideLoading();
-                    }
-                });
+                .subscribe(getDisableObserver());
 
 
     }
 
     @NotNull
-    private Function<Observable<Throwable>, ObservableSource<?>> doRetry(final int maxRetries, final int retryDelayMillis) {
-        return new Function<Observable<Throwable>, ObservableSource<?>>() {
+    private DisposableObserver<Drama> getDisableObserver() {
+        return new DisposableObserver<Drama>() {
             @Override
-            public ObservableSource<?> apply(Observable<Throwable> throwableObservable) throws Exception {
-                return throwableObservable.flatMap(new Function<Throwable, ObservableSource<?>>() {
-                    @Override
-                    public ObservableSource<?> apply(Throwable throwable) throws Exception {
-                        if (++retryCount <= maxRetries) {
-                            // When this Observable calls onNext, the original Observable will be retried (i.e. re-subscribed).
-                            Log.i(DATATAG, "get error, it will try after " + retryDelayMillis
-                                    + " millisecond, retry count " + retryCount);
-                            return Observable.timer(retryDelayMillis,
-                                    TimeUnit.MILLISECONDS);
-                        }
-                        // Max retries hit. Just pass the error along.
-                        return Observable.error(throwable);
-                    }
-                });
+            public void onNext(Drama drama) {
+                Log.i(DATATAG, "資料庫有資料");
+                loadDramaData();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(DATATAG, "onError: " + e.getMessage().toString());
+            }
+
+            @Override
+            public void onComplete() {
+                mvpView.hideLoading();
             }
         };
     }
+
 
     @NotNull
     private Function<DramaPack, ObservableSource<Drama>> insertDataToDb() {
         return new Function<DramaPack, ObservableSource<Drama>>() {
             @Override
             public ObservableSource<Drama> apply(DramaPack dramaPack) throws Exception {
-                dramaListRepository.insertDataInDb(dramaPack.getData());
+                dramaRepository.insertDataInDb(dramaPack.getData());
                 Log.i(DATATAG, "存進 DB ");
                 return new Observable<Drama>() {
                     @Override
@@ -163,7 +143,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
     public void searchDramaFromKeyWord(String searchkey) {
         Log.i(DATATAG, "從關鍵字搜尋: ");
 
-        if (dramaListRepository == null) dramaListRepository = new DramaListRepository();
+        if (dramaRepository == null) dramaRepository = new DramaRepository();
         mvpView.showLoading();
 
         if (!searchkey.equals("")) {
@@ -186,7 +166,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
                 }
             };
             String searchKeyInDb = getSearchKeyword(searchkey);
-            addSubScribe(dramaListRepository.getDramaListFromKeyWord(searchKeyInDb), dataObserver);
+            addSubScribe(dramaRepository.getDramaListFromKeyWord(searchKeyInDb), dataObserver);
         }else{
             DisposableSingleObserver dataObserverSingle = new DisposableSingleObserver<List<Drama>>() {
                 @Override
@@ -208,7 +188,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
 
 
             };
-            addSubScribe(dramaListRepository.getAllDrama(), dataObserverSingle);
+            addSubScribe(dramaRepository.getAllDrama(), dataObserverSingle);
         }
 
     }
@@ -222,11 +202,11 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
 
 
     public void updateDataFromNet() {
-        addSubScribe(dramaListRepository.getDataRemote().doOnNext(new Consumer<DramaPack>() {
+        addSubScribe(dramaRepository.getDataRemote().doOnNext(new Consumer<DramaPack>() {
             @Override
             public void accept(DramaPack dramaPack) throws Exception {
                 Log.i(TAG, "accept: 先存進 db");
-                dramaListRepository.insertDataInDb(dramaPack.getData());
+                dramaRepository.insertDataInDb(dramaPack.getData());
             }
         }).delay(500,TimeUnit.MILLISECONDS), new ApiCallback<DramaPack>() {
             @Override
@@ -262,7 +242,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
 
 
     public void addDataInToDb(){
-        if (dramaListRepository == null) dramaListRepository = new DramaListRepository();
+        if (dramaRepository == null) dramaRepository = new DramaRepository();
         InputStream raw =  Global.instance.getApplicationContext().getResources().openRawResource(R.raw.testdata);
         Reader rd = new BufferedReader(new InputStreamReader(raw));
         Gson gson = new Gson();
@@ -287,7 +267,7 @@ public class DramaListPresenter extends BasePresenter<IDramaListView> {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                dramaListRepository.dramaDao.insertDramasList(fakeList);
+                dramaRepository.dramaDao.insertDramasList(fakeList);
             }
         }).start();
     }

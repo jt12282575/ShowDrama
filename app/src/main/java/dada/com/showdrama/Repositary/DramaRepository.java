@@ -1,4 +1,4 @@
-package dada.com.showdrama.ShowDramaList;
+package dada.com.showdrama.Repositary;
 
 import android.util.Log;
 
@@ -25,23 +25,18 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public class DramaListRepository implements BaseContract.IBaseRepositary<Drama> {
+public class DramaRepository implements BaseContract.IBaseRepositary<Drama> {
     protected static ApiStores apiStores;
-    protected  DramaDao dramaDao;
+    public DramaDao dramaDao;
 
 
-    private static final String TAG = "DramaListRepository";
+    private static final String TAG = "DramaRepository";
     private static final String DATATAG = "datasource";
-    private PagedList.Config config;
-    private int PAGE_SIZE = 12;
-    private int PRE_FETCH_DISTANCE = 3;
 
-    public DramaListRepository() {
+
+    public DramaRepository() {
         dramaDao = getDramaDao();
-        config = new PagedList.Config.Builder()
-                .setPageSize(PAGE_SIZE)
-                .setPrefetchDistance(PRE_FETCH_DISTANCE)
-                .build();
+
 
 
     }
